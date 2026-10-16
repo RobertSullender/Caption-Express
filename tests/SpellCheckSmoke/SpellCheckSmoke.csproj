@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="WeCantSpell.Hunspell" Version="7.0.1" />
+    <Compile Include="../../src/CaptionExpress/SpellCheck/SpellDictionary.cs" Link="SpellDictionary.cs" />
+    <Content Include="../../src/CaptionExpress/dictionaries/en_US.aff" Link="dictionaries/en_US.aff" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="../../src/CaptionExpress/dictionaries/en_US.dic" Link="dictionaries/en_US.dic" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

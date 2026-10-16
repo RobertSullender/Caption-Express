@@ -1,0 +1,48 @@
+# Build and test output
+**/bin/
+**/obj/
+**/TestResults/
+/coverage/
+*.user
+*.suo
+*.DotSettings.user
+
+# Private first-launch runtime, model downloads, and working data
+/.cache/
+/.venv/
+/models/
+/exports/
+/finalized-datasets/
+*.gguf
+*.safetensors
+*.ckpt
+*.onnx
+
+# Private benchmark material stays out of source releases
+/test-collection/
+
+# Python and test caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Editor, machine-local settings, and secrets
+/.vs/
+/.vscode/
+/.idea/
+/.agents/
+/.codex/
+/.aws/
+.env
+.env.*
+!.env.example
+
+# Logs and temporary files
+*.log
+*.tmp
+*.part
+*~
+.DS_Store
+Thumbs.db

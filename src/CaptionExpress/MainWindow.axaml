@@ -1,0 +1,387 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:CaptionExpress"
+        xmlns:spell="clr-namespace:CaptionExpress.SpellCheck"
+        x:Class="CaptionExpress.MainWindow"
+        Title="Caption-Express"
+        Width="1480" Height="940" MinWidth="1000" MinHeight="700">
+  <Grid RowDefinitions="Auto,*" RowSpacing="4">
+  <Border Grid.Row="0" Background="#202834" Padding="7" Margin="18,12,18,0" CornerRadius="10">
+    <StackPanel Spacing="7">
+      <StackPanel Orientation="Horizontal" Spacing="8">
+        <TextBlock Text="Project" VerticalAlignment="Center" FontWeight="SemiBold" />
+        <ComboBox x:Name="ProjectCombo" Width="200" SelectionChanged="ProjectSelectionChanged" />
+        <TextBox x:Name="NewProjectNameBox" Width="190" PlaceholderText="New project name" />
+        <TextBlock Text="LTX 2.3" VerticalAlignment="Center" Foreground="#BDC8D4" />
+        <Button x:Name="CreateProjectButton" Content="Create project" Click="CreateProjectClicked" />
+      </StackPanel>
+      <Grid ColumnDefinitions="Auto,220,Auto,300" ColumnSpacing="8">
+        <TextBlock Grid.Column="0" Text="New project media" VerticalAlignment="Center" />
+        <ComboBox Grid.Column="1" x:Name="NewProjectMediaPolicyCombo"
+                  ToolTip.Tip="Fixed when the project is created. Video + audio requires an embedded audio stream; Video only removes audio from exports." />
+        <TextBlock Grid.Column="2" Text="New project video format" VerticalAlignment="Center" />
+        <ComboBox Grid.Column="3" x:Name="NewProjectVideoFormatCombo"
+                  ToolTip.Tip="Fixed when the project is created. Create another project to use a different format." />
+      </Grid>
+      <TextBlock x:Name="ProjectSummaryText" Text="Create or select a named project before exporting." TextWrapping="Wrap"
+                 Foreground="#BDC8D4" FontSize="12" />
+    </StackPanel>
+  </Border>
+  <TabControl Grid.Row="1" x:Name="WorkflowTabs">
+  <TabItem Header="One clip">
+  <Grid RowDefinitions="Auto,*,Auto" Margin="18" RowSpacing="14">
+    <Border Grid.Row="0" Background="#202834" CornerRadius="10" Padding="16">
+      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+        <StackPanel Spacing="8">
+          <TextBlock Text="Caption-Express" FontSize="23" FontWeight="Bold" />
+          <TextBlock Text="Select one video or audio file, trim it, choose a crop, then caption the exported clip."
+                     Foreground="#BDC8D4" />
+          <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+            <Button Grid.Column="0" x:Name="OpenButton" Content="Open media…" Click="OpenClicked" />
+            <TextBox Grid.Column="1" x:Name="SourcePathBox" IsReadOnly="True" PlaceholderText="No file selected" />
+            <TextBlock Grid.Column="2" x:Name="MediaInfoText" VerticalAlignment="Center" />
+          </Grid>
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <Grid Grid.Row="1" ColumnDefinitions="1.12*,0.88*" ColumnSpacing="14">
+      <Grid Grid.Column="0" RowDefinitions="Auto,*" RowSpacing="12">
+          <Border Grid.Row="0" x:Name="RangePanel" Background="#202834" CornerRadius="10" Padding="14">
+            <StackPanel Spacing="6">
+              <TextBlock Text="1 · Select the range" FontSize="17" FontWeight="SemiBold" />
+              <Border x:Name="SourcePreviewBorder" Background="Black" CornerRadius="6" Height="240">
+                <Grid>
+                  <local:CaptionVideoView x:Name="VideoView" IsVisible="False" />
+                  <Image x:Name="FirstFrameImage" Stretch="Uniform" IsVisible="False" />
+                  <Image x:Name="WaveformImage" IsVisible="False" Stretch="Uniform" />
+                </Grid>
+              </Border>
+              <StackPanel Orientation="Horizontal" Spacing="10">
+                <Button x:Name="PlayButton" Content="Play" Click="PlayClicked" />
+                <TextBlock x:Name="PlayheadText" Text="00:00:00.000" VerticalAlignment="Center" />
+                <TextBlock Text="/" VerticalAlignment="Center" Foreground="#9AA7B4" />
+                <TextBlock x:Name="DurationText" Text="00:00:00.000" VerticalAlignment="Center" />
+              </StackPanel>
+              <Slider x:Name="PlayheadSlider" Minimum="0" Maximum="1" Value="0" />
+              <Grid ColumnDefinitions="*,*,Auto,Auto" ColumnSpacing="8">
+                <StackPanel Grid.Column="0" Spacing="4">
+                  <TextBlock Text="Start" />
+                  <TextBox x:Name="StartBox" Text="00:00:00.000" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" Spacing="4">
+                  <TextBlock Text="End" />
+                  <TextBox x:Name="EndBox" Text="00:00:00.000" />
+                </StackPanel>
+                <Button Grid.Column="2" x:Name="SetStartButton" Content="Set start here" Click="SetStartClicked" VerticalAlignment="Bottom" />
+                <Button Grid.Column="3" x:Name="SetEndButton" Content="Set end here" Click="SetEndClicked" VerticalAlignment="Bottom" />
+              </Grid>
+            </StackPanel>
+          </Border>
+
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible" AllowAutoHide="False"
+                      HorizontalScrollBarVisibility="Disabled">
+          <Border Background="#202834" CornerRadius="10" Padding="14">
+            <StackPanel Spacing="10">
+              <TextBlock Text="2 · Frame and crop" FontSize="17" FontWeight="SemiBold" />
+              <TextBlock Text="Type any timecode as HH:MM:SS.mmm. Long source files are sought directly."
+                         FontSize="12" Foreground="#9AA7B4" />
+              <TextBlock x:Name="LtxPlanText" Text="Video timing: 24 fps and 8n+1 frames."
+                         FontSize="12" Foreground="#9AA7B4" TextWrapping="Wrap" />
+              <StackPanel x:Name="CropOptions" Spacing="10">
+                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="9">
+                  <TextBlock Grid.Column="0" Text="Bucket" VerticalAlignment="Center" />
+                  <ComboBox Grid.Column="1" x:Name="BucketCombo" />
+                  <Button Grid.Column="2" x:Name="NearestBucketButton" Content="Nearest" Click="NearestBucketClicked" />
+                </Grid>
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                  <TextBlock Text="Custom bucket" VerticalAlignment="Center" />
+                  <TextBox x:Name="CustomBucketWidthBox" Width="70" PlaceholderText="width" />
+                  <TextBlock Text="×" VerticalAlignment="Center" />
+                  <TextBox x:Name="CustomBucketHeightBox" Width="70" PlaceholderText="height" />
+                  <Button x:Name="AddCustomBucketButton" Content="Add to project" Click="AddCustomBucketClicked" />
+                </StackPanel>
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                  <StackPanel Grid.Column="0" Spacing="5">
+                    <TextBlock Text="Drag the crop on the source frame" Foreground="#BDC8D4" />
+                    <Border Background="Black" CornerRadius="6" Height="245">
+                      <local:CropEditor x:Name="CropEditor" />
+                    </Border>
+                  </StackPanel>
+                  <StackPanel Grid.Column="1" Spacing="5">
+                    <TextBlock Text="Resulting frame" Foreground="#BDC8D4" />
+                    <Border Background="Black" CornerRadius="6" Height="245">
+                      <local:CropOutputPreview x:Name="CropOutputPreview" />
+                    </Border>
+                  </StackPanel>
+                </Grid>
+                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                  <TextBlock Text="Horizontal" VerticalAlignment="Center" />
+                  <Slider Grid.Column="1" x:Name="CropXSlider" Minimum="0" Maximum="100" Value="50" />
+                  <TextBlock Grid.Column="2" x:Name="CropXText" Text="50%" VerticalAlignment="Center" />
+                </Grid>
+                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                  <TextBlock Text="Vertical" VerticalAlignment="Center" />
+                  <Slider Grid.Column="1" x:Name="CropYSlider" Minimum="0" Maximum="100" Value="50" />
+                  <TextBlock Grid.Column="2" x:Name="CropYText" Text="50%" VerticalAlignment="Center" />
+                </Grid>
+                <Button x:Name="CenterCropButton" Content="Center crop" Click="CenterCropClicked" HorizontalAlignment="Left" />
+              </StackPanel>
+              <TextBlock x:Name="AudioOnlyText" Text="Audio only: the waveform shows up to 60 seconds around the playhead; no video crop is needed." IsVisible="False" />
+            </StackPanel>
+          </Border>
+        </ScrollViewer>
+      </Grid>
+
+      <Grid Grid.Column="1" RowDefinitions="*,Auto" RowSpacing="10">
+      <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Visible" AllowAutoHide="False"
+                    HorizontalScrollBarVisibility="Disabled">
+        <StackPanel Spacing="12">
+          <Border Background="#202834" CornerRadius="10" Padding="14">
+            <StackPanel Spacing="9">
+              <TextBlock Text="3 · Export and caption" FontSize="17" FontWeight="SemiBold" />
+              <TextBox x:Name="ExportDirectoryBox" IsReadOnly="True" PlaceholderText="Choose a project above" />
+              <StackPanel x:Name="VideoFormatOptions" Orientation="Horizontal" Spacing="8">
+                <TextBlock Text="Project video format" VerticalAlignment="Center" />
+                <TextBlock x:Name="VideoFormatText" Text="Choose a project" VerticalAlignment="Center" />
+              </StackPanel>
+              <StackPanel x:Name="FrameRateOptions" Orientation="Horizontal" Spacing="8">
+                <TextBlock Text="Frame rate" VerticalAlignment="Center" />
+                <ComboBox x:Name="FrameRateCombo" MinWidth="230" SelectionChanged="FrameRateSelectionChanged" />
+                <TextBox x:Name="CustomFrameRateBox" Width="70" PlaceholderText="fps" />
+                <Button x:Name="AddCustomFrameRateButton" Content="Add to project" Click="AddCustomFrameRateClicked" />
+              </StackPanel>
+              <TextBlock x:Name="ExportedFileText" Text="No cropped clip exported yet." TextWrapping="Wrap"
+                         Foreground="#BDC8D4" />
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <Button x:Name="ExportButton" Content="Export new clip" Click="ExportClicked" />
+                <Button x:Name="CaptionButton" Content="Caption exported clip" Click="CaptionClicked" />
+                <Button x:Name="CancelButton" Content="Cancel" Click="CancelClicked" IsEnabled="False" />
+              </StackPanel>
+              <TextBlock Text="The source file is never modified. Captions use the new export."
+                         FontSize="12" Foreground="#9AA7B4" />
+              <TextBlock Text="Optional guidance for this clip" FontWeight="SemiBold" />
+              <spell:SpellCheckEditor x:Name="GuidanceBox" WordWrap="True" Height="115"
+                       Watermark="Example: 00:00-00:05: A girl crawls through a metal tunnel; an ambient hum and her breathing are audible." />
+              <TextBlock Text="Write quick visual or sound cues. Times start at 00:00 of the exported clip, even when its source starts later. These notes stay available for reruns of this clip."
+                         FontSize="12" Foreground="#9AA7B4" TextWrapping="Wrap" />
+              <TextBlock Text="For video with audio, guidance adds a final Gemma pass to combine visual observations, audio observations, and your notes, even when Refine is off. Review the saved draft for accuracy."
+                         FontSize="12" Foreground="#9AA7B4" TextWrapping="Wrap" />
+              <TextBlock x:Name="GuidanceReviewWarning" IsVisible="False"
+                         Text="These notes are not confirmed for this source, trim, bucket, or crop. Review their cues, then edit the notes or select Use guidance for current clip before captioning."
+                         FontSize="12" Foreground="#F5BC75" TextWrapping="Wrap" />
+              <Button x:Name="ConfirmGuidanceButton" Content="Use guidance for current clip"
+                      Click="ConfirmGuidanceClicked" IsVisible="False" HorizontalAlignment="Left" />
+            </StackPanel>
+          </Border>
+
+          <Expander Header="Model and prompts" IsExpanded="False">
+            <Border Background="#202834" Padding="14">
+              <StackPanel Spacing="8">
+                <TextBlock Text="Gemma 4 model" />
+                <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+                  <ComboBox x:Name="ModelCombo" />
+                  <Button Grid.Column="1" x:Name="RefreshModelsButton" Content="Refresh models" Click="RefreshModelsClicked" />
+                  <Button Grid.Column="2" x:Name="UnloadModelButton" Content="Unload model" Click="UnloadModelClicked" IsEnabled="False" />
+                </Grid>
+                <TextBlock Text="The selector above lists Gemma models found on this computer. The choices below show which of the four supported pairs are installed in this app. Select missing pairs to download; you can also select installed pairs to verify them. Downloads run in the background." TextWrapping="Wrap" />
+                <TextBlock x:Name="ModelStatusText" Text="Model status unknown" TextWrapping="Wrap" />
+                <TextBlock Text="App model downloads" FontWeight="SemiBold" />
+                <WrapPanel Orientation="Horizontal" ItemWidth="285" ItemHeight="46">
+                  <CheckBox x:Name="StockE2BDownloadCheck" Content="Stock E2B · Q8_0" />
+                  <CheckBox x:Name="StockE4BDownloadCheck" Content="Stock E4B · Q8_0" />
+                  <CheckBox x:Name="UncensoredE2BDownloadCheck" Content="Uncensored E2B · Q8_K_P" />
+                  <CheckBox x:Name="UncensoredE4BDownloadCheck" Content="Uncensored E4B · Q8_K_P" />
+                </WrapPanel>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <Button x:Name="DownloadModelsButton" Content="Download selected models" Click="DownloadModelsClicked" IsEnabled="False" />
+                  <Button x:Name="PauseModelDownloadsButton" Content="Pause downloads" Click="PauseModelDownloadsClicked" IsEnabled="False" />
+                </StackPanel>
+                <TextBlock x:Name="ModelDownloadStatusText" Text="Select one or more models, then click Download selected models." TextWrapping="Wrap" />
+                <ProgressBar x:Name="ModelDownloadProgress" Minimum="0" Maximum="100" Value="0" Height="8" />
+                <CheckBox x:Name="RefineCaptionCheck" Content="Refine combined video + audio caption"
+                          IsChecked="False" IsEnabled="False" />
+                <TextBlock Text="Available when the selected file has both video and audio. A final pass rewrites their observations as one caption. It starts off because refinement can misplace events; compare both drafts after a run."
+                           FontSize="12" Foreground="#9AA7B4" TextWrapping="Wrap" />
+                <CheckBox x:Name="EnableThinkingCheck" Content="Enable Gemma thinking" IsChecked="True" />
+                <TextBlock Text="Thinking may take longer. Only the final caption is saved."
+                           FontSize="12" Foreground="#9AA7B4" />
+                <CheckBox x:Name="UseDefaultSystemCheck" Content="No custom system prompt (recommended)"
+                          IsChecked="True" />
+                <spell:SpellCheckEditor x:Name="SystemPromptBox" WordWrap="True" Height="60"
+                         Watermark="Custom system prompt" IsEnabled="False" />
+                <TextBlock Text="Gemma's chat template is always used. The optional custom system prompt and thinking switch apply to all passes; the caption user prompt below still controls each task. Up to 16 frames are sampled per eight-second video section."
+                           FontSize="12" Foreground="#9AA7B4" />
+                <TextBlock Text="Caption user prompt" FontWeight="SemiBold" />
+                <spell:SpellCheckEditor x:Name="UserPromptBox" WordWrap="True" Height="230"
+                         Watermark="Instructions sent with each video and audio section" />
+                <TextBlock Text="The one editable prompt controls the passes: [[video: ...]] for visuals, [[soundtrack: ...]] for a video's sound, [[audio_only: ...]] for audio-only files, and [[refine: ...]] for the final combined caption. [[later: ...]] and [[later_audio: ...]] apply to later sections. {previous_caption} refers to the preceding section of that pass."
+                           FontSize="12" Foreground="#9AA7B4" TextWrapping="Wrap" />
+                <Button x:Name="ResetUserPromptButton" Content="Restore default user prompt"
+                        Click="ResetUserPromptClicked" HorizontalAlignment="Left" />
+                <Expander Header="Worker setup (advanced)" IsExpanded="False">
+                  <StackPanel Spacing="6" Margin="6">
+                    <TextBlock Text="Python executable" />
+                    <TextBox x:Name="PythonPathBox" />
+                    <TextBlock Text="Change this only if the project worker fails to start."
+                               FontSize="12" Foreground="#9AA7B4" TextWrapping="Wrap" />
+                  </StackPanel>
+                </Expander>
+              </StackPanel>
+            </Border>
+          </Expander>
+        </StackPanel>
+      </ScrollViewer>
+      <Border Grid.Row="1" Background="#202834" CornerRadius="10" Padding="14">
+        <StackPanel Spacing="8">
+          <TextBlock Text="Caption results" FontSize="17" FontWeight="SemiBold" />
+          <TextBlock Text="Caption (.txt): edit the generated draft, then save" />
+          <spell:SpellCheckEditor x:Name="OverallBox" WordWrap="True" Height="160"
+                   VerticalScrollBarVisibility="Visible" IsEnabled="False"
+                   Watermark="The generated caption appears here for you to edit." />
+          <WrapPanel Orientation="Horizontal">
+            <Button x:Name="CompareDraftButton" Content="Show initial draft"
+                    Click="CompareDraftClicked" IsEnabled="False" IsVisible="False" Margin="0,0,8,0" />
+            <Button x:Name="SaveButton" Content="Save caption" Click="SaveClicked"
+                    IsEnabled="False" Margin="0,0,8,0" />
+            <Button x:Name="DiscardEditsButton" Content="Discard unsaved edits"
+                    Click="DiscardEditsClicked" IsEnabled="False" />
+          </WrapPanel>
+        </StackPanel>
+      </Border>
+      </Grid>
+    </Grid>
+
+    <Border Grid.Row="2" x:Name="StatusStrip" Background="#202834" CornerRadius="10" Padding="10">
+      <Grid ColumnDefinitions="*,210" ColumnSpacing="12">
+        <StackPanel Spacing="2" VerticalAlignment="Center">
+          <TextBlock x:Name="StatusText" Text="Open a video or audio file to begin." TextWrapping="Wrap" />
+          <TextBlock x:Name="DownloadSummaryText" Text="Model downloads: choose models under Model and prompts." FontSize="11"
+                     Foreground="#9AA7B4" TextWrapping="Wrap" />
+        </StackPanel>
+        <ProgressBar Grid.Column="1" x:Name="TaskProgress" Minimum="0" Maximum="100" Value="0"
+                     VerticalAlignment="Center" Height="8" />
+      </Grid>
+    </Border>
+  </Grid>
+  </TabItem>
+  <TabItem Header="Batch">
+    <Grid Margin="18" RowDefinitions="Auto,Auto,*,Auto" RowSpacing="12">
+      <Border Background="#202834" CornerRadius="10" Padding="16">
+        <StackPanel Spacing="10">
+          <TextBlock Text="Caption a folder" FontSize="22" FontWeight="Bold" />
+          <TextBlock Text="Files run one at a time. Each full video uses its nearest bucket, a centered crop, and the project's video format. Files outside the project's media type and exact duplicates are skipped; originals stay untouched."
+                     TextWrapping="Wrap" Foreground="#BDC8D4" />
+          <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+            <TextBox x:Name="BatchFolderBox" PlaceholderText="Folder containing source media" />
+            <Button Grid.Column="1" x:Name="ChooseBatchFolderButton" Content="Choose folder…" Click="ChooseBatchFolderClicked" />
+          </Grid>
+          <CheckBox x:Name="BatchSubfoldersCheck" Content="Include subfolders" IsChecked="False" />
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <TextBlock Text="Project video format" VerticalAlignment="Center" />
+            <TextBlock x:Name="BatchVideoFormatText" Text="Choose a project" VerticalAlignment="Center" />
+          </StackPanel>
+          <TextBlock x:Name="BatchTimingText" Text="Select a project to see its video export and media rules."
+                     FontSize="12" Foreground="#9AA7B4" TextWrapping="Wrap" />
+          <TextBlock x:Name="BatchOutputText" Text="Working exports folder: " TextWrapping="Wrap" Foreground="#BDC8D4" />
+          <TextBlock Text="The batch uses the selected Gemma model, user prompt, system prompt, and thinking switch under One clip → Model and prompts."
+                     TextWrapping="Wrap" Foreground="#BDC8D4" />
+          <CheckBox x:Name="BatchRefineCheck" Content="Refine combined video + audio caption" IsChecked="False" />
+          <TextBlock Text="Applies only to video with audio in joint or legacy projects. Video-only projects caption visuals only."
+                     FontSize="12" Foreground="#9AA7B4" TextWrapping="Wrap" />
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <Button x:Name="StartBatchButton" Content="Start folder run" Click="StartBatchClicked" />
+            <Button x:Name="CancelBatchButton" Content="Cancel run" Click="CancelBatchClicked" IsEnabled="False" />
+          </StackPanel>
+        </StackPanel>
+      </Border>
+      <Border Grid.Row="1" Background="#202834" CornerRadius="10" Padding="12">
+        <StackPanel Spacing="8">
+          <TextBlock x:Name="BatchStatusText" Text="Choose a folder to begin." TextWrapping="Wrap" />
+          <ProgressBar x:Name="BatchProgress" Minimum="0" Maximum="100" Value="0" Height="8" />
+        </StackPanel>
+      </Border>
+      <Border Grid.Row="2" Background="#202834" CornerRadius="10" Padding="12">
+        <ListBox x:Name="BatchLogList" />
+      </Border>
+      <TextBlock Grid.Row="3" Text="After the run, open Edit Dataset to review captions and build a trainer manifest."
+                 Foreground="#BDC8D4" />
+    </Grid>
+  </TabItem>
+  <TabItem Header="Edit Dataset">
+    <Grid Margin="18" RowDefinitions="Auto,*,Auto" RowSpacing="12">
+      <Border Background="#202834" CornerRadius="10" Padding="14">
+        <StackPanel Spacing="8">
+          <TextBlock Text="Review working exports" FontSize="22" FontWeight="Bold" />
+          <TextBlock Text="Select a pair to edit its caption. Ctrl+click selects individual pairs; Shift+click selects a range for review actions."
+                     TextWrapping="Wrap" Foreground="#BDC8D4" />
+          <TextBlock x:Name="DatasetWorkingFolderText" TextWrapping="Wrap" />
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <TextBlock Text="Show" VerticalAlignment="Center" />
+            <ComboBox x:Name="DatasetFilterCombo" MinWidth="160" SelectionChanged="DatasetFilterChanged" />
+            <Button x:Name="RefreshDatasetButton" Content="Refresh pairs" Click="RefreshDatasetClicked" />
+            <TextBlock x:Name="DatasetListSummaryText" VerticalAlignment="Center" TextWrapping="Wrap" />
+          </StackPanel>
+          <TextBlock x:Name="DatasetStatusText" Text="Choose a pair to review." TextWrapping="Wrap" Foreground="#BDC8D4" />
+        </StackPanel>
+      </Border>
+      <Grid Grid.Row="1" ColumnDefinitions="0.42*,0.58*" ColumnSpacing="12">
+        <Border Background="#202834" CornerRadius="10" Padding="10">
+          <ListBox x:Name="DatasetPairsList" SelectionMode="Multiple"
+                   ScrollViewer.VerticalScrollBarVisibility="Visible"
+                   ScrollViewer.AllowAutoHide="False" SelectionChanged="DatasetPairSelected" />
+        </Border>
+        <Border Grid.Column="1" Background="#202834" CornerRadius="10" Padding="10">
+          <Grid RowDefinitions="2*,Auto,3*,Auto" RowSpacing="8">
+            <Border Background="Black" CornerRadius="6" MinHeight="105" MaxHeight="220">
+              <Grid>
+                <local:CaptionVideoView x:Name="DatasetVideoView" IsVisible="False" />
+                <Image x:Name="DatasetFirstFrameImage" Stretch="Uniform" IsVisible="False" />
+              </Grid>
+            </Border>
+            <StackPanel Grid.Row="1" Spacing="2">
+              <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+                <Button x:Name="DatasetPlayButton" Content="Play" Click="DatasetPlayClicked" IsEnabled="False" VerticalAlignment="Top" />
+                <TextBlock Grid.Column="1" x:Name="DatasetSelectedFileText" Text="Select a pair to review."
+                           TextWrapping="Wrap" MaxHeight="50" />
+              </Grid>
+              <TextBlock x:Name="DatasetAudioWarningText" IsVisible="False"
+                         Text="No audio stream · the stock joint LTX trainer skips this video."
+                         Foreground="#E8C77A" TextWrapping="Wrap" FontSize="12" />
+            </StackPanel>
+            <spell:SpellCheckEditor Grid.Row="2" x:Name="DatasetCaptionBox" WordWrap="True" MinHeight="75"
+                                   VerticalScrollBarVisibility="Visible"
+                                   Watermark="Caption text" IsEnabled="False" />
+            <StackPanel Grid.Row="3" Spacing="6">
+              <TextBlock x:Name="DatasetSelectionText" Text="Choose a pair to edit its caption." FontSize="12" Foreground="#BDC8D4" />
+              <WrapPanel Orientation="Horizontal">
+                <Button x:Name="DatasetSaveButton" Content="Save caption" Click="DatasetSaveClicked" IsEnabled="False" Margin="0,0,8,0" />
+                <Button x:Name="DatasetDiscardEditsButton" Content="Discard edits" Click="DatasetDiscardEditsClicked" IsEnabled="False" Margin="0,0,8,0" />
+                <Button x:Name="DatasetReviewButton" Content="Mark reviewed" Click="DatasetReviewClicked" IsEnabled="False" Margin="0,0,8,0" />
+                <Button x:Name="DatasetPendingButton" Content="Needs review" Click="DatasetPendingClicked" IsEnabled="False" Margin="0,0,8,0" />
+                <Button x:Name="DatasetExcludeButton" Content="Exclude" Click="DatasetExcludeClicked" IsEnabled="False" />
+              </WrapPanel>
+            </StackPanel>
+          </Grid>
+        </Border>
+      </Grid>
+      <Expander Grid.Row="2" Header="Finalize reviewed video pairs" Background="#202834" CornerRadius="10" Padding="8">
+        <StackPanel Spacing="8" Margin="8,0,8,8">
+          <TextBlock x:Name="FinalDatasetDescriptionText" Text="Creates a separate folder with reviewed videos, matching text files, and a trainer manifest. Only pairs copied successfully are removed from this project. Videos without audio remain in the dataset, but the stock joint audio/video LTX trainer skips them."
+                     TextWrapping="Wrap" Foreground="#BDC8D4" />
+          <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+            <TextBox x:Name="FinalDatasetPathBox" PlaceholderText="New finalized dataset folder" />
+            <Button Grid.Column="1" x:Name="ChooseFinalDatasetParentButton" Content="Choose parent…" Click="ChooseFinalDatasetParentClicked" />
+          </Grid>
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <Button x:Name="FinalizeDatasetButton" Content="Finalize reviewed pairs" Click="FinalizeDatasetClicked" />
+            <TextBlock Text="Only reviewed video pairs are finalized; other working pairs remain." VerticalAlignment="Center"
+                       TextWrapping="Wrap" Foreground="#BDC8D4" />
+          </StackPanel>
+        </StackPanel>
+      </Expander>
+    </Grid>
+  </TabItem>
+  </TabControl>
+  </Grid>
+</Window>
