@@ -2,6 +2,8 @@
 
 A local Ubuntu desktop app for making reviewed video/text pairs for LTX 2.3 training. Open one media file, choose any start and end time, position a fixed no-padding crop, and export a new clip. The original is untouched. One selected Gemma 4 E2B or E4B GGUF captions sampled video and the exported soundtrack, with a single editable caption field.
 
+![Caption-Express One clip view with video preview, export controls, and editable caption](screenshots/Screenshot-5.png)
+
 ## Quick start
 
 Caption-Express currently installs and runs from its source checkout on an Ubuntu x86-64 desktop. There is no `.deb` or AppImage package. Keep the checkout in a writable folder, open a terminal there, and run:
